@@ -12,7 +12,7 @@ function formatMoney(amount) {
 }
 
 function calculatePerformance(userData) {
-  if (!userData?.meta || !userData?.fechaObjetivo) return null;
+  if (!userData?.meta || !userData?.fechaObjetivo || !userData?.createdAt) return null;
   
   const ahora = new Date();
   const objetivo = new Date(userData.fechaObjetivo);
@@ -20,6 +20,7 @@ function calculatePerformance(userData) {
   
   const diasTotales = (objetivo - inicio) / (1000 * 60 * 60 * 24);
   const diasTranscurridos = (ahora - inicio) / (1000 * 60 * 60 * 24);
+  const horasTranscurridas = diasTranscurridos * 24;
   
   if (diasTranscurridos <= 0) return null;
   
@@ -29,13 +30,27 @@ function calculatePerformance(userData) {
   const diff = real - esperado;
   const percentage = esperado > 0 ? ((diff / esperado) * 100) : 0;
   
+  // Calculate required rates
+  const remaining = userData.meta - real;
+  const diasRestantes = Math.max((objetivo - ahora) / (1000 * 60 * 60 * 24), 0);
+  const semanasRestantes = diasRestantes / 7;
+  const mesesRestantes = diasRestantes / 30;
+  
   return {
     esperado,
     real,
     diff,
     percentage,
     diasTranscurridos: Math.floor(diasTranscurridos),
-    diasTotales: Math.floor(diasTotales)
+    diasTotales: Math.floor(diasTotales),
+    horasTranscurridas,
+    // Required rates to meet goal
+    requiredPerHour: diasRestantes > 0 ? remaining / (diasRestantes * 24) : 0,
+    requiredPerDay: diasRestantes > 0 ? remaining / diasRestantes : 0,
+    requiredPerWeek: semanasRestantes > 0 ? remaining / semanasRestantes : 0,
+    requiredPerMonth: mesesRestantes > 0 ? remaining / mesesRestantes : 0,
+    remaining,
+    diasRestantes: Math.floor(diasRestantes)
   };
 }
 
@@ -144,22 +159,32 @@ export default function Dashboard() {
             />
           </div>
           <div className="progress-text">
-            Día {performance.diasTranscurridos} de {performance.diasTotales}
+            Día {performance.diasTranscurridos} de {performance.diasTotales} || Falta {formatMoney(performance.remaining)}
           </div>
         </div>
       )}
 
       {/* Quick Stats */}
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-label">Por día</div>
-          <div className="stat-value">{performance ? formatMoney(performance.esperado / performance.diasTranscurridos) : '$0'}</div>
+      {performance && (
+        <div className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-label">Por hora</div>
+            <div className="stat-value">{formatMoney(performance.requiredPerHour)}</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-label">Por día</div>
+            <div className="stat-value">{formatMoney(performance.requiredPerDay)}</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-label">Por semana</div>
+            <div className="stat-value">{formatMoney(performance.requiredPerWeek)}</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-label">Por mes</div>
+            <div className="stat-value">{formatMoney(performance.requiredPerMonth)}</div>
+          </div>
         </div>
-        <div className="stat-card">
-          <div className="stat-label">Por semana</div>
-          <div className="stat-value">{performance ? formatMoney((performance.esperado / performance.diasTranscurridos) * 7) : '$0'}</div>
-        </div>
-      </div>
+      )}
 
       {/* Add Transaction */}
       <div className="card transaction-card">

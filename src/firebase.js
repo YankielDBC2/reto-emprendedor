@@ -4,12 +4,12 @@ import { getFirestore } from 'firebase/firestore';
 
 // Replace with your Firebase config
 const firebaseConfig = {
-  apiKey: "AIzaSyCZQieJkYabfNQUHvcZcmkjNq8EAQlyq0Y",
-  authDomain: "reto-emprendedor.firebaseapp.com",
-  projectId: "reto-emprendedor",
-  storageBucket: "reto-emprendedor.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef"
+  apiKey: "AIzaSyB2eVN7LKlmXYXJ-DeAe625F6nGV5EncPY",
+  authDomain: "reto-emprendedor-deac0.firebaseapp.com",
+  projectId: "reto-emprendedor-deac0",
+  storageBucket: "reto-emprendedor-deac0.firebasestorage.app",
+  messagingSenderId: "868583804447",
+  appId: "1:868583804447:web:82401c2aca6480137a0f2a"
 };
 
 const app = initializeApp(firebaseConfig);

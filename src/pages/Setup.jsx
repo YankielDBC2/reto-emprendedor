@@ -35,12 +35,11 @@ export default function Setup() {
         meta: parseFloat(meta),
         fechaObjetivo: fecha,
         hasSetup: true,
-        balance: 0,
-        transactions: []
+        createdAt: new Date().toISOString()
       };
       
       await updateDoc(doc(db, 'users', user.uid), userData);
-      updateUserData(userData);
+      updateUserData({ ...userData, balance: 0, transactions: [] });
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);

@@ -23,10 +23,34 @@ export function AuthProvider({ children }) {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
-        const docRef = doc(db, 'users', currentUser.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setUserData(docSnap.data());
+        try {
+          const docRef = doc(db, 'users', currentUser.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setUserData(docSnap.data());
+          } else {
+            // Create user document if doesn't exist
+            await setDoc(docRef, {
+              email: currentUser.email,
+              createdAt: new Date().toISOString(),
+              hasSetup: false,
+              meta: 0,
+              balance: 0,
+              transactions: [],
+              promos: []
+            });
+            setUserData({
+              email: currentUser.email,
+              createdAt: new Date().toISOString(),
+              hasSetup: false,
+              meta: 0,
+              balance: 0,
+              transactions: [],
+              promos: []
+            });
+          }
+        } catch (err) {
+          console.error('Error loading user data:', err);
         }
       } else {
         setUserData(null);
@@ -39,10 +63,15 @@ export function AuthProvider({ children }) {
 
   const signup = async (email, password) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const now = new Date().toISOString();
     await setDoc(doc(db, 'users', userCredential.user.uid), {
       email,
-      createdAt: new Date().toISOString(),
-      hasSetup: false
+      createdAt: now,
+      hasSetup: false,
+      meta: 0,
+      balance: 0,
+      transactions: [],
+      promos: []
     });
     return userCredential;
   };
