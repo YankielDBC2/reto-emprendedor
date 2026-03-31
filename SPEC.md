@@ -1,72 +1,123 @@
-# Reto Emprendedor - Specification
+# Reto Emprendedor v2 - Specification
 
 ## Overview
-- **Nombre:** Reto Emprendedor
-- **Tipo:** Single-page web app
-- **Función:** Calculadora de metas financieras - desglosa una meta de dinero en intervalos de tiempo (hora/día/semana/mes)
-- **Target:** Entrepreneurs, freelancers, gente con metas financieras
+- **Nombre:** Reto Emprendedor v2
+- **Tipo:** Web App con Auth
+- **Función:** Calculadora de metas + tracking financiero + dashboard personal
+- **Target:** Entrepreneurs, freelancers
 
-## UI/UX Spec
+## Tech Stack
+- React + Vite
+- Firebase Authentication (email/password)
+- Firebase Firestore (database)
+- CSS vanilla (mantener estilo brutalist)
 
-### Layout
-- Single page, centered content
-- Max-width: 600px
-- Responsive (mobile-first)
+## Pages
 
-### Visual Style
-- **Estilo:** Brutalist Financial - fuerte, directo, sin decoraciones innecesarias
-- **Tema:** Dark mode con acentos en verde neon (dinero)
-- **Tipografía:** 
-  - Headers: "Bebas Neue" (bold, impactante)
-  - Body: "JetBrains Mono" (números, código)
-- **Colores:**
-  - Background: #0a0a0a
-  - Card: #141414
-  - Border: #2a2a2a
-  - Accent: #00ff88 (verde dinero)
-  - Warning: #ff4444
-  - Text: #ffffff / #888888
+### 1. Landing / Login
+- Título: "RETO EMPRENDEDOR"
+- Formulario registro (email, password)
+- Formulario login
+- Botón "Empezar Reto" → crea cuenta
 
-### Components
-1. **Header** - Título grande "RETO EMPRENDEDOR"
-2. **Input Card** - Meta y fecha objetivo
-3. **Results Grid** - 4 cards (hora/día/semana/mes)
-4. **Progress Bar** - Visual del tiempo restante
-5. **CTA Button** - "Empezar Reto"
+### 2. Setup (solo primera vez)
+- Input: Meta financiera ($)
+- Input: Fecha objetivo
+- Botón "Crear Reto" → dashboard
 
-### Animaciones
-- Cards aparecen con stagger (50ms delay)
-- Números cuentan animadamente
-- Hover states sutiles
+### 3. Dashboard
+- **Header:** Meta actual + progreso
+- **Stats:** $/hora, $/día, $/semana, $/mes (calculado vs real)
+- **Balance:** Total ganancias - gastos
+- **Performance:** Atrasado/Adelantado (%)
+- **Quick Add:** Botones rápido (+$income, -$expense)
+- **Historial:** Lista últimos movimientos
+
+## Data Model (Firestore)
+
+### Collection: users
+```json
+{
+  "email": "user@example.com",
+  "createdAt": "timestamp",
+  "meta": 10000,
+  "fechaObjetivo": "2026-12-31",
+  "balance": 1500,
+  "transactions": [
+    {
+      "type": "income|expense",
+      "amount": 500,
+      "description": "Client payment",
+      "date": "timestamp"
+    }
+  ]
+}
+```
 
 ## Functionality
 
-### Inputs
-- Meta financiera ($)
-- Fecha objetivo
+### Auth
+- Registro con email/password
+- Login
+- Logout
+- Protected routes
 
-### Outputs (calculado automáticamente)
-| Interval | Fórmula |
-|----------|---------|
-| Por hora | meta / horas_totales |
-| Por día | meta / días_totales |
-| Por semana | meta / semanas_totales |
-| Por mes | meta / meses_totales |
+### Dashboard
+- Meta + fecha objetivo
+- Balance actual (ganancias - gastos)
+- Performance diario:
+  - Esperado: meta / días_totales
+  - Real: balance_actual / días_transcurridos
+  - Δ = ((real - esperado) / esperado) * 100
 
-### Validaciones
-- Meta > 0
-- Fecha > hoy
-- Mostrar warning si meta muy agresiva
+### Transacciones
+- Agregar ingreso (+)
+- Agregar gasto (-)
+- Descripción opcional
+- Timestamp automático
+
+### Cálculo 24h
+- Cada día: comparar balance vs esperado
+- Mostrar: "Vas +X% adelantado" o "Vas -X% atrasado"
+
+## UI/UX
+
+### Estilo
+- Dark mode (#0a0a0a)
+- Verde neon (#00ff88) para dinero positivo
+- Rojo (#ff4444) para negativo/advertencia
+- Bebas Neue headers, JetBrains Mono números
+
+### Responsive
+- Mobile-first
+- Cards stack en columna
+- Botones táctiles (min 44px)
+- Input full-width
+
+## Firebase Config
+- Crear proyecto en console.firebase.google.com
+- Habilitar Email/Password auth
+- Firestore rules: solo usuario propio puede ver sus datos
 
 ## Acceptance Criteria
-- [ ] User puede introducir meta y fecha
-- [ ] Se calculan los 4 intervalos automáticamente
-- [ ] Números formateados con $ y separadores de miles
-- [ ] Warning si la meta requiere más de $100/hora
-- [ ] Diseño responsive funciona en móvil
-- [ ] Animaciones smooth
+- [ ] Registro + Login funcionando
+- [ ] Dashboard muestra meta y progreso
+- [ ] Agregar ingresos/gastos funciona
+- [ ] Cálculo de performance (atrasado/adelantado)
+- [ ] 100% responsive
+- [ ] Datos persisten en Firestore
 
-## Tech
-- HTML + CSS + Vanilla JS
-- Google Fonts (Bebas Neue, JetBrains Mono)
-- No dependencies
+## Archivos a crear
+- src/main.jsx
+- src/App.jsx
+- src/firebase.js
+- src/pages/Login.jsx
+- src/pages/Setup.jsx
+- src/pages/Dashboard.jsx
+- src/components/Header.jsx
+- src/components/TransactionForm.jsx
+- src/components/TransactionList.jsx
+- src/components/Stats.jsx
+- index.html (actualizado)
+- vite.config.js
+- package.json
