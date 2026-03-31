@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reto Emprendedor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --card: #141414;
+            --border: #2a2a2a;
+            --accent: #00ff88;
+            --warning: #ff4444;
+            --text: #ffffff;
+            --text-dim: #888888;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            background-image: 
+                radial-gradient(ellipse at top, rgba(0, 255, 136, 0.03) 0%, transparent 50%),
+                linear-gradient(180deg, var(--bg) 0%, #050505 100%);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            letter-spacing: 0.1em;
+            color: var(--text);
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        h1 span {
+            color: var(--accent);
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: slideUp 0.5s ease-out forwards;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+
+        .card-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.25rem;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+            color: var(--text-dim);
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        input[type="number"],
+        input[type="date"] {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.25rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="number"]:focus,
+        input[type="date"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
+        }
+
+        .input-prefix {
+            position: relative;
+        }
+
+        .input-prefix::before {
+            content: '$';
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent);
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .input-prefix input {
+            padding-left: 2rem;
+        }
+
+        .warning {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid var(--warning);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            display: none;
+            animation: shake 0.5s ease-out;
+        }
+
+        .warning.visible {
+            display: block;
+        }
+
+        .warning-text {
+            color: var(--warning);
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .warning-text::before {
+            content: '⚠';
+            font-size: 1rem;
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .result-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .result-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 40px rgba(0, 255, 136, 0.1);
+        }
+
+        .result-card.visible {
+            animation: countUp 0.6s ease-out forwards;
+        }
+
+        .result-card:nth-child(1) { animation-delay: 0.3s; }
+        .result-card:nth-child(2) { animation-delay: 0.35s; }
+        .result-card:nth-child(3) { animation-delay: 0.4s; }
+        .result-card:nth-child(4) { animation-delay: 0.45s; }
+
+        .result-label {
+            font-size: 0.625rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .result-value.warning {
+            color: var(--warning);
+            text-shadow: 0 0 20px rgba(255, 68, 68, 0.3);
+        }
+
+        .progress-section {
+            margin-top: 2rem;
+            opacity: 0;
+            animation: slideUp 0.5s ease-out 0.5s forwards;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), #00cc6a);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 1s ease-out;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .cta-btn {
+            display: block;
+            width: 100%;
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            border-radius: 8px;
+            padding: 1.25rem;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.25rem;
+            letter-spacing: 0.15em;
+            cursor: pointer;
+            margin-top: 2rem;
+            opacity: 0;
+            animation: slideUp 0.5s ease-out 0.6s forwards;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 255, 136, 0.3);
+        }
+
+        .meta-display {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(0, 255, 136, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 8px;
+            opacity: 0;
+            animation: slideUp 0.5s ease-out 0.15s forwards;
+        }
+
+        .meta-label {
+            font-size: 0.625rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        .meta-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-top: 0.25rem;
+        }
+
+        .time-display {
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+            opacity: 0;
+            animation: slideUp 0.5s ease-out 0.25s forwards;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes countUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @media (max-width: 480px) {
+            .results {
+                grid-template-columns: 1fr;
+            }
+
+            .result-card {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1rem;
+            }
+
+            .result-label {
+                margin-bottom: 0;
+            }
+
+            .result-value {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Reto <span>Emprendedor</span></h1>
+            <p class="subtitle">Transforma tu meta en acción</p>
+        </header>
+
+        <div class="card">
+            <div class="card-title">Define tu meta</div>
+            
+            <div class="input-group">
+                <label>Meta financiera</label>
+                <div class="input-prefix">
+                    <input type="number" id="meta" placeholder="10000" min="1">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Fecha objetivo</label>
+                <input type="date" id="fecha">
+            </div>
+
+            <div class="warning" id="warning">
+                <div class="warning-text">
+                    Meta muy agresiva. Requires más de $100/hora. Ajusta el plazo.
+                </div>
+            </div>
+        </div>
+
+        <div class="meta-display" id="metaDisplay" style="display: none;">
+            <div class="meta-label">Tu meta</div>
+            <div class="meta-value" id="metaValue">$0</div>
+        </div>
+
+        <div class="time-display" id="timeDisplay" style="display: none;">
+            Tiempo restante: <span id="timeRemaining">0 días</span>
+        </div>
+
+        <div class="results" id="results" style="display: none;">
+            <div class="result-card">
+                <div class="result-label">Por hora</div>
+                <div class="result-value" id="porHora">$0</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Por día</div>
+                <div class="result-value" id="porDia">$0</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Por semana</div>
+                <div class="result-value" id="porSemana">$0</div>
+            </div>
+            <div class="result-card">
+                <div class="result-label">Por mes</div>
+                <div class="result-value" id="porMes">$0</div>
+            </div>
+        </div>
+
+        <div class="progress-section" id="progressSection" style="display: none;">
+            <div class="progress-header">
+                <span>Progreso temporal</span>
+                <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <button class="cta-btn" id="ctaBtn">Empezar Reto</button>
+    </div>
+
+    <script>
+        const metaInput = document.getElementById('meta');
+        const fechaInput = document.getElementById('fecha');
+        const warningEl = document.getElementById('warning');
+        const resultsEl = document.getElementById('results');
+        const metaDisplay = document.getElementById('metaDisplay');
+        const metaValue = document.getElementById('metaValue');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const timeRemaining = document.getElementById('timeRemaining');
+        const progressSection = document.getElementById('progressSection');
+        const progressFill = document.getElementById('progressFill');
+        const progressPercent = document.getElementById('progressPercent');
+        const ctaBtn = document.getElementById('ctaBtn');
+
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        fechaInput.min = today;
+
+        function formatMoney(amount) {
+            return '$' + amount.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function calculate() {
+            const meta = parseFloat(metaInput.value);
+            const fecha = new Date(fechaInput.value);
+            const ahora = new Date();
+
+            if (!meta || meta <= 0 || !fechaInput.value || fecha <= ahora) {
+                resultsEl.style.display = 'none';
+                metaDisplay.style.display = 'none';
+                timeDisplay.style.display = 'none';
+                progressSection.style.display = 'none';
+                warningEl.classList.remove('visible');
+                return false;
+            }
+
+            // Calculate time differences
+            const diffMs = fecha - ahora;
+            const diasTotales = diffMs / (1000 * 60 * 60 * 24);
+            const horasTotales = diasTotales * 24;
+            const semanasTotales = diasTotales / 7;
+            const mesesTotales = diasTotales / 30;
+
+            // Calculate rates
+            const porHora = meta / horasTotales;
+            const porDia = meta / diasTotales;
+            const porSemana = meta / semanasTotales;
+            const porMes = meta / mesesTotales;
+
+            // Update display
+            metaValue.textContent = formatMoney(meta);
+
+            // Time remaining
+            const dias = Math.floor(diasTotales);
+            const hours = Math.floor((diasTotales % 1) * 24);
+            timeRemaining.textContent = `${dias} días${hours > 0 ? ` ${hours} horas` : ''}`;
+            timeDisplay.style.display = 'block';
+
+            // Show warning if > $100/hour
+            if (porHora > 100) {
+                warningEl.classList.add('visible');
+            } else {
+                warningEl.classList.remove('visible');
+            }
+
+            // Update result cards
+            document.getElementById('porHora').textContent = formatMoney(porHora);
+            document.getElementById('porDia').textContent = formatMoney(porDia);
+            document.getElementById('porSemana').textContent = formatMoney(porSemana);
+            document.getElementById('porMes').textContent = formatMoney(porMes);
+
+            // Show results with animation
+            metaDisplay.style.display = 'block';
+            resultsEl.style.display = 'grid';
+            progressSection.style.display = 'block';
+
+            // Animate result cards
+            const cards = document.querySelectorAll('.result-card');
+            cards.forEach(card => card.classList.add('visible'));
+
+            // Progress bar (time elapsed since today as placeholder)
+            const totalDias = Math.max(diasTotales, 1);
+            const elapsedDias = 0; // From now until target
+            const progress = Math.min((1 - (diasTotales / totalDias)) * 100, 100);
+            progressFill.style.width = '0%';
+            progressPercent.textContent = '0%';
+            
+            setTimeout(() => {
+                progressFill.style.width = '0%';
+            }, 100);
+
+            return true;
+        }
+
+        // Event listeners
+        metaInput.addEventListener('input', calculate);
+        fechaInput.addEventListener('input', calculate);
+
+        ctaBtn.addEventListener('click', () => {
+            if (calculate()) {
+                // Scroll to results
+                resultsEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    </script>
+</body>
+</html>
