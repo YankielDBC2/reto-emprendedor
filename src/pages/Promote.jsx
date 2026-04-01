@@ -10,6 +10,7 @@ export default function Promote() {
   const { user, userData, updateUserData } = useAuth();
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
+  const [link, setLink] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -28,6 +29,7 @@ export default function Promote() {
       const newPromo = {
         id: Date.now().toString(),
         title: title.trim(),
+        link: link.trim(),
         description: description.trim(),
         createdAt: new Date().toISOString()
       };
@@ -43,6 +45,7 @@ export default function Promote() {
       });
 
       setTitle('');
+      setLink('');
       setDescription('');
     } catch (err) {
       console.error(err);
@@ -66,7 +69,7 @@ export default function Promote() {
         <div className="card-title">Nuevo promocion</div>
         <form onSubmit={handleSubmit}>
           <div className="promo-input">
-            <label>Título (máx 100 caracteres)</label>
+            <label>Titulo (max 100 caracteres)</label>
             <input
               type="text"
               value={title}
@@ -81,11 +84,21 @@ export default function Promote() {
           </div>
 
           <div className="promo-input">
-            <label>Descripción corta</label>
+            <label>Link (https://...)</label>
+            <input
+              type="url"
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
+              placeholder="https://tu-sitio.com"
+            />
+          </div>
+
+          <div className="promo-input">
+            <label>Descripcion corta</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="¿Qué ofreces?..."
+              placeholder="Que ofreces?..."
             />
           </div>
 
@@ -106,14 +119,27 @@ export default function Promote() {
         ) : (
           promos.map((promo) => (
             <div key={promo.id} className="promo-card">
-              <div className="promo-card-icon">🚀</div>
               <div className="promo-card-content">
                 <div className="promo-card-title">{promo.title}</div>
                 {promo.description && (
                   <div className="promo-card-desc">{promo.description}</div>
                 )}
+                {promo.link && (
+                  <div className="promo-card-link">{promo.link}</div>
+                )}
               </div>
-              <button className="promo-card-check">✓ Ver</button>
+              {promo.link ? (
+                <a 
+                  href={promo.link} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="promo-card-check"
+                >
+                  Ver
+                </a>
+              ) : (
+                <span className="promo-card-check disabled">-</span>
+              )}
             </div>
           ))
         )}
